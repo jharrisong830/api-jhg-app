@@ -1,7 +1,10 @@
 from dataclasses import dataclass
+import requests
+from json import dumps
 
 from api.firebase.firestore import store
 from api.firebase.auth import auth
+from api.config import get_firebase_config
 
 @dataclass
 class User:
@@ -56,4 +59,12 @@ def verify_user_id_token(id_token: str) -> str | None:
         return uid
     except:
         return None
+    
+def sign_in_user(email: str, password: str) -> str | None:
+    url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={get_firebase_config().firebase_api_key}"
+    request_body = dumps({ "email": email, "password": password, "returnSecureToken": True })
+    res = requests.post(url, data=request_body)
+    if res.status_code != 200:
+        return None
+    return res.json().get("idToken")
     
