@@ -1,6 +1,5 @@
 import firebase_admin
 from firebase_admin import credentials
-from functools import lru_cache
 from json import loads
 
 from api.config import get_firebase_config
