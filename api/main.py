@@ -10,7 +10,8 @@ app = FastAPI(title="api.jhg.app")
 app.include_router(router)
 
 origins = [
-    "http://localhost:5173"
+    "http://localhost:5173",
+    "https://jhg.app"
 ]
 
 app.add_middleware(
