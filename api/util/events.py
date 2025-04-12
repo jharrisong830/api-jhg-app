@@ -10,8 +10,8 @@ class Event:
     description: str
     location: str
     color: str
-    start: int # timestamp
-    end: int
+    start: str # iso formatted datetime string
+    end: str
     allDay: bool
     organizer: str
     invitees: list[str]
@@ -49,7 +49,9 @@ class Event:
 def get_user_events(user_id: str) -> list[Event]:
     query_snapshot = store.collection("events").where(filter=Or([
         FieldFilter("organizer", "==", user_id),
-        FieldFilter("invitees", "array-contains", user_id)
+        FieldFilter("invitees", "array_contains", user_id)
     ])).get()
     return list(map(lambda doc: Event.from_dict(doc.to_dict()), query_snapshot))
     
+def create_event(event: Event):
+    store.collection("events").document(event.id).set(event.to_dict())

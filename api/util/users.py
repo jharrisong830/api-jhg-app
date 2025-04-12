@@ -43,19 +43,19 @@ class User:
 
 @dataclass
 class SigninResponse:
-    id_token: str
+    token: str
     uid: str
 
     @staticmethod
     def from_response_dict(data: dict):
         return SigninResponse(
-            id_token=data.get("idToken"),
+            token=data.get("idToken"),
             uid=data.get("localId")
         )
     
     def to_dict(self):
         return {
-            "id_token": self.id_token,
+            "token": self.id_token,
             "uid": self.uid
         }
 

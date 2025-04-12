@@ -8,11 +8,15 @@ class SigninBody:
     email: str
     password: str
 
+@dataclass
+class TokenBody:
+    token: str
+
 router = APIRouter()
 
-@router.get("/", response_model=list[User], responses={401: {"description": "Invalid token"}})
-async def all_users(token: str):
-    uid = verify_user_id_token(token)
+@router.post("/", response_model=list[User], responses={401: {"description": "Invalid token"}})
+async def all_users(body: TokenBody):
+    uid = verify_user_id_token(body.token)
     if not uid:
         raise HTTPException(status_code=401, detail="Invalid token")
     users = get_all_users()
@@ -26,8 +30,8 @@ async def sign_in(body: SigninBody):
     return res
 
 @router.post("/me", response_model=User, responses={401: {"description": "Invalid token"}})
-async def me(token: str):
-    uid = verify_user_id_token(token)
+async def me(body: TokenBody):
+    uid = verify_user_id_token(body.token)
     if not uid:
         raise HTTPException(status_code=401, detail="Invalid token")
     user = get_user_by_uid(uid)
