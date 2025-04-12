@@ -15,7 +15,7 @@ class CreateEventBody:
 
 router = APIRouter()
 
-@router.post("/", response_model=Event, responses={401: {"description": "Invalid token"}})
+@router.post("/new", response_model=Event, responses={401: {"description": "Invalid token"}})
 async def create_event_request(body: CreateEventBody):
     uid = verify_user_id_token(body.token)
     if not uid:

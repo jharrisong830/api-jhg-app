@@ -9,13 +9,13 @@ from api.config import get_firebase_config
 
 @dataclass
 class User:
-    uid: str | None
     regId: str
     userName: str
     email: str
     displayName: str
     admin: bool
     registered: bool
+    uid: str | None = None
 
     @staticmethod
     def from_dict(data: dict):
@@ -88,3 +88,5 @@ def sign_in_user(email: str, password: str) -> SigninResponse | None:
         return None
     return SigninResponse.from_response_dict(res.json())
     
+def create_user(user: User):
+    store.collection("users").document(user.regId).set(user.to_dict())
