@@ -52,6 +52,13 @@ def get_user_events(user_id: str) -> list[Event]:
         FieldFilter("invitees", "array_contains", user_id)
     ])).get()
     return list(map(lambda doc: Event.from_dict(doc.to_dict()), query_snapshot))
+
+def get_event_by_id(event_id: str) -> Event | None:
+    doc_ref = store.collection("events").document(event_id)
+    doc = doc_ref.get()
+    if not doc.exists:
+        return None
+    return Event.from_dict(doc.to_dict())
     
 def create_event(event: Event):
     store.collection("events").document(event.id).set(event.to_dict())

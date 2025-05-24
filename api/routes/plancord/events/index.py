@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from dataclasses import dataclass
 
 from api.util.users import verify_user_id_token
-from api.util.events import Event, get_user_events, create_event
+from api.util.events import Event, get_user_events, create_event, get_event_by_id
 
 @dataclass
 class TokenBody:
@@ -30,3 +30,13 @@ async def all_users(user_id: str, body: TokenBody):
         raise HTTPException(status_code=401, detail="Invalid token")
     events = get_user_events(user_id)
     return events
+
+@router.post("/{id}", response_model=Event, responses={401: {"description": "Invalid token"}, 404: {"description": "Event not found"}})
+async def event_by_id(id: str, body: TokenBody):
+    authUid = verify_user_id_token(body.token)
+    if not authUid:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    event = get_event_by_id(id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return event
