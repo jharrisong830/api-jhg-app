@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from dataclasses import dataclass
 
-from api.util.users import User, SigninResponse, get_all_users, verify_user_id_token, sign_in_user, get_user_by_uid
+from api.util.users import User, SigninResponse, get_all_users, verify_user_id_token, sign_in_user, get_user_by_uid, create_user
 
 @dataclass
 class SigninBody:
@@ -28,10 +28,11 @@ async def all_users(body: TokenBody):
     return users
 
 @router.post("/new", response_model=User, responses={401: {"description": "Invalid token"}})
-async def create_user(body: CreateUserBody):
+async def create_user_route(body: CreateUserBody):
     uid = verify_user_id_token(body.token)
     if not uid:
         raise HTTPException(status_code=401, detail="Invalid token")
+    create_user(body.user)
     return body.user
 
 @router.post("/signin", response_model=SigninResponse, responses={401: {"description": "Invalid credentials"}})
@@ -47,6 +48,16 @@ async def me(body: TokenBody):
     if not uid:
         raise HTTPException(status_code=401, detail="Invalid token")
     user = get_user_by_uid(uid)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+@router.post("/{id}", response_model=User, responses={401: {"description": "Invalid token"}, 404: {"description": "User not found"}})
+async def user_by_id(id: str, body: TokenBody):
+    authUid = verify_user_id_token(body.token)
+    if not authUid:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    user = get_user_by_uid(id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
